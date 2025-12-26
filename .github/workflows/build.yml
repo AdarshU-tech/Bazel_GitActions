@@ -1,20 +1,22 @@
-name: Build and Test with Bazel
+name: BazelGitAction
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out repository
+        uses: actions/checkout@v3
 
       - name: Set up Bazel
-        uses: bazel-contrib/setup-bazel@v4
+        uses: bazel-contrib/setup-bazel@v3
         with:
           bazel-version: 6.5.0
 
