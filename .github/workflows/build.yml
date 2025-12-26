@@ -1,4 +1,4 @@
-name: BazelGitAction
+name: Build and Test with Bazel
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Bazel
-        uses: bazel-contrib/setup-bazel@v3
+        uses: bazel-contrib/setup-bazel@v0.15.0
         with:
           bazel-version: 6.5.0
 
