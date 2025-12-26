@@ -17,8 +17,7 @@ jobs:
 
       - name: Set up Bazel
         uses: bazel-contrib/setup-bazel@main
-        with:
-          bazel-version: 6.5.0
+
 
       - name: Build the app
         run: bazel build //:hello_app
