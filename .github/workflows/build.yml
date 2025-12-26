@@ -15,13 +15,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Install Bazel via Bazelisk (GitHub Source)
-        run: |
-          curl -L -o bazelisk https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64
-          chmod +x bazelisk
-          sudo mv bazelisk /usr/local/bin/bazel
-        env:
-          BAZELISK_BASE_URL: "https://github.com/bazelbuild/bazel/releases/download"
+      # 🔽 Call the reusable Bazelisk workflow here
+      - name: Install Bazel (via reusable workflow)
+        uses: ./.github/workflows/bazelisk_download.yml
+        with:
+          bazelisk_url: "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64"
+          install_dir: "bazelisk-bin"
 
       - name: Build the app
         run: bazel build //:hello_app
