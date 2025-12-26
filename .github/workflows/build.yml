@@ -15,16 +15,24 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Set up Bazel
-        uses: bazel-contrib/setup-bazel@main
+      # Fix: Install Bazel via GitHub Releases (avoids expired TLS cert)
+      - name: Install Bazel (via Bazelisk)
+        run: |
+          curl -L -o bazelisk https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64
+          chmod +x bazelisk
+          sudo mv bazelisk /usr/local/bin/bazel
+        env:
+          BAZELISK_BASE_URL: "https://github.com/bazelbuild/bazel/releases/download"
 
-
+      # Build step
       - name: Build the app
         run: bazel build //:hello_app
 
+      # Test step
       - name: Run unit tests
         run: bazel test //:hello_test
 
+      # Upload build artifact
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
