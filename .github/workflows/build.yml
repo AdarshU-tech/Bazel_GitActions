@@ -9,13 +9,13 @@ on:
 
 jobs:
   install-bazelisk:
-    uses: ./.github/workflows/bazelisk_download.yml
+    uses: ./.github/workflows/bazelisk_download.yml   # ⬅️ Correct filename
     with:
       bazelisk_url: "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64"
       install_dir: "bazelisk-bin"
 
   build:
-    needs: install-bazelisk          # ⬅️ Wait for Bazel install first
+    needs: install-bazelisk
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
