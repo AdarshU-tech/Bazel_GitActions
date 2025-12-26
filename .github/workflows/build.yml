@@ -8,19 +8,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  install-bazelisk:
+    uses: ./.github/workflows/bazelisk_download.yml
+    with:
+      bazelisk_url: "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64"
+      install_dir: "bazelisk-bin"
 
+  build:
+    needs: install-bazelisk          # ⬅️ Wait for Bazel install first
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-
-      # 🔽 Call the reusable Bazelisk workflow here
-      - name: Install Bazel (via reusable workflow)
-        uses: ./.github/workflows/bazelisk_download.yml
-        with:
-          bazelisk_url: "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64"
-          install_dir: "bazelisk-bin"
 
       - name: Build the app
         run: bazel build //:hello_app
