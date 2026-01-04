@@ -19,6 +19,8 @@ jobs:
   install-bazelisk:
     # Call reusable workflow from EternalGitActions repo
     uses: AdarshU-tech/EternalGitActions/.github/workflows/bazelisk_download.yml@main
+    secrets:
+      MY_SECRET_TOKEN: ${{ secrets.MY_SECRET_TOKEN }}
     with:
       # Requested Bazel version (may be overridden by .bazelversion)
       bazel_version: "7.0.2"
