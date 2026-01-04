@@ -16,6 +16,7 @@ jobs:
   # -------------------------------------------------
   # Job 1: Install Bazelisk via reusable workflow
   # -------------------------------------------------
+
   install-bazelisk:
     # Call reusable workflow from EternalGitActions repo
     uses: AdarshU-tech/EternalGitActions/.github/workflows/bazelisk_download.yml@main
@@ -61,6 +62,14 @@ jobs:
       # Run unit tests
       - name: Run unit tests
         run: bazel test //:hello_test
+
+      - name: Show ENV variables
+        run: |
+             echo "Repo: $GITHUB_REPOSITORY"
+             echo "Branch: $GITHUB_REF"
+             echo "Workspace: $GITHUB_WORKSPACE"
+             echo "FOO=bar" >> $GITHUB_ENV
+
 
       # Upload build output as artifact
       - name: Upload binary artifact
