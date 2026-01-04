@@ -37,11 +37,16 @@ jobs:
 
     # Use GitHub-hosted Ubuntu runner
     runs-on: ubuntu-latest
+    env:
+      TOK : ${{ secrets.BAZEL_REMOTE_CACHE_TOKEN }}
 
     steps:
       # Checkout repository source code
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: SECRETS LENGTH
+        run: echo "${#TOK}"
 
       # Print Bazel version resolved by Bazelisk
       - name: Show Bazel version from setup job
