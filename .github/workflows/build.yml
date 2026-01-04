@@ -9,18 +9,19 @@ on:
 
 jobs:
   install-bazelisk:
-    # 📌 Call the workflow from the other repo
-    uses: AdarshU-tech/EternalGitActions/.github/workflows/bazelisk_dowload.yml@main
-    with:
-      bazelisk_url: "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64"
-      install_dir: "bazelisk-bin"
+    # ✅ Call reusable workflow from EternalGitActions
+    uses: AdarshU-tech/EternalGitActions/.github/workflows/bazelisk_download.yml@main
 
   build:
-    needs: install-bazelisk   # Wait for Bazel to be installed
+    needs: install-bazelisk
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Verify Bazel installation
+        run: bazel --version
 
       - name: Build the app
         run: bazel build //:hello_app
