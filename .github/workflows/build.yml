@@ -1,55 +1,57 @@
 name: Build and Test with Bazel
 
 on:
-  # Run when code is pushed to main
+  # Run when code is pushed to main branch
   push:
     branches: [ "main" ]
 
-  # Run on pull requests targeting main
+  # Run when a pull request targets main
   pull_request:
     branches: [ "main" ]
 
-  # Allow manual trigger from GitHub UI
+  # Allow manual trigger from GitHub Actions UI
   workflow_dispatch:
 
 jobs:
-  # ---------------------------------------------
-  # Job 1: Install Bazelisk using reusable workflow
-  # ---------------------------------------------
+  # -------------------------------------------------
+  # Job 1: Install Bazelisk via reusable workflow
+  # -------------------------------------------------
   install-bazelisk:
-    # Call reusable workflow from EternalGitActions
+    # Call reusable workflow from EternalGitActions repo
     uses: AdarshU-tech/EternalGitActions/.github/workflows/bazelisk_download.yml@main
     with:
-      # 🔹 Input defined in workflow_call.inputs
+      # Requested Bazel version (may be overridden by .bazelversion)
       bazel_version: "7.0.2"
 
-      # 🔹 Boolean input to control verification step
+      # Whether to print bazel --version in setup job
       verify_install: true
 
-  # ---------------------------------------------
-  # Job 2: Build & test after Bazel is installed
-  # ---------------------------------------------
+  # -------------------------------------------------
+  # Job 2: Build & Test using Bazel
+  # -------------------------------------------------
   build:
-    # Ensure Bazel is installed first
+    # Ensure setup job completes successfully
     needs: install-bazelisk
 
     # Use GitHub-hosted Ubuntu runner
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository code
+      # Checkout repository source code
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # Optional re-check (good for learning/debugging)
-      - name: Verify Bazel installation
-        run: bazel --version
+      # Print Bazel version resolved by Bazelisk
+      - name: Show Bazel version from setup job
+        run: |
+          echo "Resolved Bazel version: \
+          ${{ needs.install-bazelisk.outputs.resolved_bazel_version }}"
 
       # Build Bazel target
       - name: Build the app
         run: bazel build //:hello_app
 
-      # Run Bazel tests
+      # Run unit tests
       - name: Run unit tests
         run: bazel test //:hello_test
 
