@@ -1,0 +1,104 @@
+# ---------------------------------------------
+# Workflow name
+# This is what you see in the GitHub Actions UI
+# ---------------------------------------------
+name: Learn GitHub Actions – Full Example
+
+# ---------------------------------------------
+# on:
+# Defines WHEN this workflow should run
+# ---------------------------------------------
+on:
+  # Runs automatically when code is pushed to main branch
+  push:
+    branches:
+      - main
+
+  # Runs when a Pull Request is opened, updated, or reopened
+  pull_request:
+    branches:
+      - main
+
+  # Allows manual triggering from GitHub UI (Actions tab → Run workflow)
+  workflow_dispatch:
+
+# ---------------------------------------------
+# jobs:
+# A workflow is made of ONE OR MORE jobs
+# Jobs run in PARALLEL by default unless "needs" is used
+# Each job runs on a fresh runner (VM or machine)
+# ---------------------------------------------
+jobs:
+
+  # ---------------------------------------------
+  # Job 1: Setup Bazel using external reusable workflow
+  # ---------------------------------------------
+  setup-bazel:
+    # "uses" means this job CALLS a reusable workflow
+    # Format: OWNER/REPO/.github/workflows/file.yml@branch_or_tag
+    uses: AdarshU-tech/EternalGitActions/.github/workflows/bazelisk_download.yml@main
+
+  # ---------------------------------------------
+  # Job 2: Build & Test using GitHub-hosted runner
+  # ---------------------------------------------
+  build-and-test:
+    # needs:
+    # Ensures this job runs ONLY AFTER setup-bazel completes
+    needs: setup-bazel
+
+    # runs-on:
+    # Defines which runner executes this job
+    # ubuntu-latest = GitHub-hosted runner (free, ephemeral VM)
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------------------------
+      # Step 1: Checkout repository code
+      # ---------------------------------------------
+      - name: Checkout source code
+        # This is a GitHub-provided action
+        # Without this, your repo code will NOT be available
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------
+      # Step 2: Verify Bazel is available
+      # ---------------------------------------------
+      - name: Verify Bazel installation
+        run: bazel --version
+
+      # ---------------------------------------------
+      # Step 3: Build using Bazel
+      # ---------------------------------------------
+      - name: Build application
+        run: bazel build //...
+
+      # ---------------------------------------------
+      # Step 4: Run tests
+      # ---------------------------------------------
+      - name: Run unit tests
+        run: bazel test //...
+
+  # ---------------------------------------------
+  # Job 3: Run on PRIVATE / SELF-HOSTED runner
+  # ---------------------------------------------
+  private-runner-job:
+    # This job depends on build job
+    needs: build-and-test
+
+    # runs-on with self-hosted runners
+    # Labels must match runner labels configured in GitHub
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+      # Example: you may also add
+      # - my-company-runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run command on private runner
+        run: |
+          echo "This job runs on a private/self-hosted runner"
+          uname -a
