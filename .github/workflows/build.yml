@@ -1,34 +1,59 @@
 name: Build and Test with Bazel
 
 on:
+  # Run when code is pushed to main
   push:
     branches: [ "main" ]
+
+  # Run on pull requests targeting main
   pull_request:
     branches: [ "main" ]
+
+  # Allow manual trigger from GitHub UI
   workflow_dispatch:
 
 jobs:
+  # ---------------------------------------------
+  # Job 1: Install Bazelisk using reusable workflow
+  # ---------------------------------------------
   install-bazelisk:
-    # ✅ Call reusable workflow from EternalGitActions
+    # Call reusable workflow from EternalGitActions
     uses: AdarshU-tech/EternalGitActions/.github/workflows/bazelisk_download.yml@main
+    with:
+      # 🔹 Input defined in workflow_call.inputs
+      bazel_version: "7.0.2"
 
+      # 🔹 Boolean input to control verification step
+      verify_install: true
+
+  # ---------------------------------------------
+  # Job 2: Build & test after Bazel is installed
+  # ---------------------------------------------
   build:
+    # Ensure Bazel is installed first
     needs: install-bazelisk
+
+    # Use GitHub-hosted Ubuntu runner
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repository code
       - name: Check out repository
         uses: actions/checkout@v4
 
+      # Optional re-check (good for learning/debugging)
       - name: Verify Bazel installation
         run: bazel --version
 
+      # Build Bazel target
       - name: Build the app
         run: bazel build //:hello_app
 
+      # Run Bazel tests
       - name: Run unit tests
         run: bazel test //:hello_test
 
+      # Upload build output as artifact
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
